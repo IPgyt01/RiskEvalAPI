@@ -1,57 +1,48 @@
 [![Downloads](https://pepy.tech/badge/optopsy)](https://pepy.tech/project/optopsy)
 [![Black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/ambv/black)
 
-# Optopsy
-
-Optopsy is a nimble backtesting and statistics library for option strategies, it is designed to answer questions like
-"How do straddles perform on the SPX?" or "Which strikes and/or expiration dates should I choose to make the most potential profit?"
-
-Use cases for Optopsy:
-* Generate option strategies from raw option chain datasets for your own analysis
-* Discover performance statistics on **percentage change** for various options strategies on a given stock
-
-## Supported Option Strategies
+## Поддерживаемые стратегии
 * Calls/Puts
 * Straddles/Strangles
 * Vertical Call/Put Spreads
 
-## Documentation
+## Документация библиотеки
 Please see the [wiki](https://github.com/michaelchu/optopsy/wiki) for API reference.
 
-## Usage
+## Использование
 
-### Use Your Data
-* Use data from any source, just provide a Pandas dataframe with the required columns when calling optopsy functions.
+### Используйте свои данные
+* Используйте данные из любого источника, просто укажите фрейм данных Pandas с необходимыми столбцами при вызове функций optopsy.
 
-### Dependencies
-You will need Python 3.6 or newer and Pandas 0.23.1 or newer and Numpy 1.14.3 or newer.
+### Зависимости
+Вам понадобится Python 3.6 или новее, Pandas 0.23.1 или новее и Numpy 1.14.3 или новее.
 
-### Installation
+### Установка
 ```
 pip install optopsy==2.0.1
 ```
 
-### Example
+### Пример
 
-Let's see how long calls perform on the SPX on a small demo dataset on the SPX:
+Давайте посмотрим, как долго выполняются вызовы в SPX на небольшом демонстрационном наборе данных в SPX:
 
-**Note:** As of July 2024, the link below is broken, however DeltaNeutral still provides free data [here](https://historicaloptiondata.com/free-data/).
-You should still be able to proceed by mapping the columns according to the current format of the sample data as shown below.
+** Примечание: ** По состоянию на июль 2024 года ссылка ниже не работает, однако DeltaNeutral по-прежнему предоставляет бесплатные данные [здесь] (https://historicaloptiondata.com/free-data /).
+Вы все равно сможете продолжить сопоставление столбцов в соответствии с текущим форматом образца данных, как показано ниже.
 
-~~Download the following data sample from DeltaNeutral: http://www.deltaneutral.com/files/Sample_SPX_20151001_to_20151030.csv~~
+~~ Загрузите следующий образец данных с DeltaNeutral: http://www.deltaneutral.com/files/Sample_SPX_20151001_to_20151030.csv ~~
 
-This dataset is for the month of October in 2015, lets load it into Optopsy. First create a small helper function
-that returns a file path to our file. We will store it under a folder named 'data', in the same directory as the working python file.
+Этот набор данных относится к октябрю 2015 года, давайте загрузим его в Optopsy. Сначала создайте небольшую вспомогательную функцию 
+которая возвращает путь к нашему файлу. Мы сохраним его в папке с именем 'data', в том же каталоге, что и рабочий файл python.
 ```
 def filepath():
     curr_file = os.path.abspath(os.path.dirname(__file__))
     return os.path.join(curr_file, "./data/Sample_SPX_20151001_to_20151030.csv")
 ```
 
-Next lets use this function to pass in the file path string into Optopsy's `csv_data()` function, we will map the column
-indices using the defined function parameters. We are omitting the `start_date` and `end_date` parameters in this call because
-we want to include the entire dataset. The numeric values represent the column number as found in the sample file, the
-numbers are 0-indexed:
+Далее давайте воспользуемся этой функцией, чтобы передать строку пути к файлу в функцию Optopsy `csv_data ()`, мы сопоставим столбцы 
+индексы, используя определенные параметры функции. Мы опускаем параметры `start_date` и `end_date` в этом вызове, потому что 
+мы хотим включить весь набор данных. Числовые значения представляют номер столбца, найденный в файле примера, 
+числа проиндексированы на 0:
 ```
 import optopsy as op
 
@@ -67,19 +58,18 @@ spx_data = op.csv_data(
     ask=11,
 )
 ```  
-The `csv_data()` function is a convenience function. Under the hood it uses Panda's `read_csv()` function to do the import.
-There are other parameters that can help with loading the csv data, consult the code/future documentation to see how to use them.
+Функция `csv_data ()` - это удобная функция. Изначально она использует функцию `read_csv()` от Panda для выполнения импорта.
+Существуют и другие параметры, которые могут помочь с загрузкой csv-данных, обратитесь к коду / будущей документации, чтобы узнать, как их использовать.
 
-Optopsy is a small simple library that offloads the heavy work of backtesting option strategies, the API is designed to be simple
-and easy to implement into your regular Panda's data analysis workflow. As such, we just need to call the `long_calls()` function
-to have Optopsy generate all combinations of a simple long call strategy for the specified time period and return a DataFrame. Here we
-also use Panda's `round()` function afterwards to return statistics within two decimal places.
+Optopsy - это небольшая простая библиотека, которая разгружает тяжелую работу по тестированию альтернативных стратегий, API разработан таким образом, чтобы быть простым 
+и его легко внедрить в обычный рабочий процесс анализа данных Panda. Таким образом, нам просто нужно вызвать функцию `long_calls()` 
+чтобы Optopsy сгенерировала все комбинации простой стратегии длинных вызовов за указанный период времени и вернула фрейм данных. Здесь мы 
+также впоследствии используем функцию round () от Panda, чтобы возвращать статистику с точностью до двух знаков после запятой.
 
 ```
 long_calls_spx_pct_chgs = op.long_calls(spx_data).round(2)
 ```
-
-The function will returned a Pandas DataFrame containing the statistics on the **percentange changes** of running long calls in all *valid* combinations on the SPX:
+Функция вернет фрейм данных Pandas, содержащий статистику по ** процентным изменениям ** выполняемых длительных вызовов во всех * допустимых * комбинациях в SPX:
 
 |    | dte_range   | otm_pct_range   |   count |   mean |   std |   min |   25% |   50% |   75% |   max |
 |----|-------------|-----------------|---------|--------|-------|-------|-------|-------|-------|-------|
